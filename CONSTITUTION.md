@@ -360,11 +360,28 @@ they are done, the rules above are conventions rather than constraints.
 1. **Enable Pages.** Settings → Pages → Build and deployment → Source:
    **GitHub Actions**.
 2. **Protect `main`.** Settings → Rules → Rulesets → New branch ruleset,
-   targeting `main`:
+   targeting `refs/heads/main`, enforcement active, with **no bypass actors** —
+   an empty bypass list is what stops an admin pushing straight to a branch
+   that deploys on push:
    - Restrict deletions
    - Block force pushes
-   - Require a pull request before merging
-   - Require status checks to pass → add **Verify**
+   - Require a pull request before merging, and within it:
+     - Allowed merge methods: **Squash only** (Article 2 wants one commit per
+       change; leaving "Merge" enabled silently permits merge commits)
+     - Require conversation resolution before merging
+     - Required approvals: **0** — see the note below
+   - Require status checks to pass:
+     - Require branches to be up to date before merging, so two PRs that are
+       each green against an older `main` cannot combine into a broken one
+     - Add **Verify**
+
+   **On required approvals.** GitHub does not let you approve your own pull
+   request, so on a single-maintainer repository any value above 0 makes `main`
+   unmergeable unless you add yourself as a bypass actor — which reopens the
+   hole the empty bypass list closes. 0 is deliberate, not an oversight: the
+   pull request itself and a required **Verify** run are what enforce Article 3.
+   Raise it to 1 as soon as a second person has write access.
+
 3. **Confirm the first deploy** at https://drewlew13.github.io/drew-lewis/.
 
 ## Appendix B — Command reference
