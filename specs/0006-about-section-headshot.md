@@ -1,8 +1,9 @@
 ---
 id: 0006
 title: About section with a headshot and the link bank
-status: draft
+status: done
 derived: 2026-09-16
+implemented: 2026-09-16
 ---
 
 ## Problem
@@ -172,11 +173,30 @@ rejected anything is not known to work.
 - **The privacy scan** continues to cover the built output for phone shapes,
   street addresses and unapproved email addresses.
 
-## Open questions
+## Resolved questions
 
-1. **The photograph itself.** Send it whenever; square, and 800px or larger on
-   each side is plenty. It does not need preparing — EXIF stripping is handled
-   here, and the crop is a circular mask rather than a destructive cut.
-2. **Whether the blurb's voice should change** once it sits beside a face. It
-   currently reads as a résumé line in the third person. Out of scope for this
-   spec; worth its own if the answer is yes.
+1. **The photograph.** The placeholder ships now. Swapping in the real photo is
+   a one-file replacement in `src/assets/`, plus flipping `isPlaceholder` to
+   `false` and changing the alt text to "Drew Lewis" — which the schema requires
+   to happen together. Send it as it comes off the camera; EXIF is handled here.
+2. **The blurb's voice.** Declined for now. The text stays as it is, and
+   changing it to first person is its own change if Drew wants it.
+
+### What implementation turned up
+
+**The GPS directory is IFD3.** `sharp`'s typed `Exif` interface exposes only
+`IFD0` through `IFD3`, with no `GPS` key, so the first version of the fixture
+failed to typecheck. In libvips' EXIF model IFD3 _is_ the GPS directory, which
+made the type-correct fixture also the more accurate one — it writes a real GPS
+block rather than an arbitrary tag.
+
+**The rename caught a stale reference immediately.** `tests/content.spec.ts`
+still asserted against `#summary` in its years-of-experience test, and the run
+failed on the missing locator. That is the rename working: the id moved in one
+file and everything still pointing at the old one was surfaced rather than
+silently passing over an element that no longer exists.
+
+**The guard was proved against a planted image**, not only its own fixture: an
+image carrying a GPS EXIF block was written into `src/assets/`, and the run
+failed with `src/assets/leaky-photo.jpg carries an EXIF block` — naming the file
+and the rule, and nothing about the metadata itself.

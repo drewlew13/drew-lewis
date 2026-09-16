@@ -74,6 +74,43 @@ export const educationSchema = z.object({
   location: nonEmpty,
 });
 
+/**
+ * The headshot. `alt` and `isPlaceholder` must agree, enforced here rather than
+ * only in a test: a placeholder must not ship described as a photograph of
+ * Drew, and the real photograph must not ship still described as a placeholder.
+ *
+ * `file` is a name, not an import. The tests read this record, and a bundler
+ * image import would not resolve outside Astro's build — the same reason `zod`
+ * is a direct dependency. The page does the importing.
+ *
+ * See specs/0006-about-section-headshot.md.
+ */
+export const headshotSchema = z
+  .object({
+    file: nonEmpty,
+    alt: nonEmpty,
+    isPlaceholder: z.boolean(),
+  })
+  .superRefine((value, ctx) => {
+    const saysPlaceholder = /placeholder/i.test(value.alt);
+    if (value.isPlaceholder && !saysPlaceholder) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['alt'],
+        message:
+          'isPlaceholder is true, so the alt text must say it is a placeholder',
+      });
+    }
+    if (!value.isPlaceholder && saysPlaceholder) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['alt'],
+        message:
+          'isPlaceholder is false, so the alt text must not call it a placeholder',
+      });
+    }
+  });
+
 export const skillGroupSchema = z.object({
   name: nonEmpty,
   items: z.array(nonEmpty).min(1),
@@ -84,3 +121,4 @@ export type Profile = z.infer<typeof profileSchema>;
 export type Entry = z.infer<typeof entrySchema>;
 export type Education = z.infer<typeof educationSchema>;
 export type SkillGroup = z.infer<typeof skillGroupSchema>;
+export type Headshot = z.infer<typeof headshotSchema>;

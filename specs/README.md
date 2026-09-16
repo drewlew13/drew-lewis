@@ -14,6 +14,6 @@ reality — supersede it with a new spec instead.
 | [0003](./0003-resume-content-page.md) | Résumé content on the homepage, with a link bank | `done` | 2026-09-16 | 2026-09-16 |
 | [0004](./0004-section-driven-navigation.md) | Header navigation derived from the section list | `done` | 2026-09-16 | 2026-09-16 |
 | [0005](./0005-contact-email-link.md) | Contact email link with a Gmail sub-address | `done` | 2026-09-16 | 2026-09-16 |
-| [0006](./0006-about-section-headshot.md) | About section with a headshot and the link bank | `draft` | 2026-09-16 | — |
+| [0006](./0006-about-section-headshot.md) | About section with a headshot and the link bank | `done` | 2026-09-16 | 2026-09-16 |
 
 Statuses: `draft`, `accepted`, `in-progress`, `done`, `superseded`, `withdrawn`.
