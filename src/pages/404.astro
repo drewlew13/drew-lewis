@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+---
+
+<BaseLayout
+  title="Page not found | Drew Lewis"
+  description="That page does not exist."
+>
+  <h1 class="text-4xl font-semibold tracking-tight text-ink">Page not found</h1>
+  <p class="mt-4 max-w-prose text-lg text-pretty text-ink-muted">
+    That page does not exist, or it moved.
+  </p>
+  <p class="mt-6">
+    <a
+      class="font-medium text-accent underline underline-offset-4"
+      href={withBase('/')}
+    >
+      Back to the homepage
+    </a>
+  </p>
+</BaseLayout>

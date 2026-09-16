@@ -1,0 +1,57 @@
+{
+  "name": "drew-lewis",
+  "version": "0.1.0",
+  "description": "Portfolio site for Drew Lewis, built with Astro and Tailwind, hosted on GitHub Pages.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "node scripts/preview.mjs",
+    "check:astro": "astro check",
+    "check:format": "prettier --check .",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test:a11y": "playwright test tests/a11y.spec.ts",
+    "test:links": "playwright test tests/links.spec.ts",
+    "verify": "npm run check:format && npm run lint && npm run check:specs && npm run check:astro && npm run build && npm run test",
+    "test": "playwright test",
+    "check:specs": "node scripts/check-specs.mjs",
+    "specs:index": "node scripts/check-specs.mjs --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drewlew13/drew-lewis.git"
+  },
+  "author": "Drew Lewis",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/drewlew13/drew-lewis/issues"
+  },
+  "homepage": "https://github.com/drewlew13/drew-lewis#readme",
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.3.2",
+    "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.20.3",
+    "eslint": "10.10.0",
+    "eslint-plugin-astro": "3.2.0",
+    "eslint-plugin-jsx-a11y-x": "0.2.0",
+    "globals": "17.12.0",
+    "linkinator": "8.1.0",
+    "prettier": "3.9.7",
+    "prettier-plugin-astro": "1.0.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.0"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  }
+}

@@ -1,0 +1,87 @@
+name: CI
+
+# Runs the same gate that CONSTITUTION.md requires locally. If `npm run verify`
+# passes on your machine, it passes here — CI is a backstop, not a substitute.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The spec and change log guards below diff against the base branch.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npm run check:format
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check specs
+        run: npm run check:specs
+
+      - name: Typecheck
+        run: npm run check:astro
+
+      # These two need a base branch to compare against, so they cannot run as
+      # part of `npm run verify` on a developer's machine.
+      - name: Check frozen specs
+        if: github.event_name == 'pull_request'
+        run: |
+          node scripts/check-specs.mjs --frozen "origin/$BASE"
+        env:
+          BASE: ${{ github.base_ref }}
+
+      - name: Require a change log entry for constitution changes
+        if: github.event_name == 'pull_request'
+        run: |
+          changed=$(git diff --name-only "origin/$BASE"...HEAD)
+          if grep -qxF 'CONSTITUTION.md' <<<"$changed" \
+            && ! grep -qxF 'CONSTITUTION-CHANGELOG.md' <<<"$changed"; then
+            echo "::error::CONSTITUTION.md changed without a CONSTITUTION-CHANGELOG.md entry. See Article 9."
+            exit 1
+          fi
+        env:
+          BASE: ${{ github.base_ref }}
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Accessibility and link checks
+        run: npm test
+
+      - name: Upload test report on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

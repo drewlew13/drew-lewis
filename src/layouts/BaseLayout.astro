@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body class="font-sans antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-surface-raised focus:px-4 focus:py-2 focus:text-ink focus:outline-2 focus:outline-accent"
+    >
+      Skip to content
+    </a>
+
+    <div class="mx-auto flex min-h-dvh max-w-3xl flex-col px-6">
+      <header class="flex items-center justify-between py-8">
+        <a
+          href={withBase('/')}
+          class="text-lg font-semibold tracking-tight text-ink hover:text-accent"
+        >
+          Drew Lewis
+        </a>
+        <nav aria-label="Primary">
+          <ul class="flex gap-6 text-sm text-ink-muted">
+            <li>
+              <a class="hover:text-accent" href={withBase('/')}>
+                Home
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <main id="main" class="flex-1 py-8">
+        <slot />
+      </main>
+
+      <footer class="border-t border-border py-8 text-sm text-ink-muted">
+        <p>&copy; {new Date().getFullYear()} Drew Lewis</p>
+      </footer>
+    </div>
+  </body>
+</html>
