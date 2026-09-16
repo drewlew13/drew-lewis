@@ -35,8 +35,9 @@ npm run specs:index                              # regenerate specs/README.md
 ```
 
 Statuses move `draft → accepted → in-progress → done`, with `withdrawn` and
-`superseded` as exits. Set `implemented` to the merge date when you set `done`;
-the validator requires each without the other to be absent.
+`superseded` as exits. Set `implemented` to the merge date when you set `done`.
+A spec keeps that date if it is later `superseded`; no other status may carry
+one.
 
 **A `done` spec is frozen.** Only `status` and `superseded-by` may change on
 it — never the body, and never to bring it in line with what the code does now.

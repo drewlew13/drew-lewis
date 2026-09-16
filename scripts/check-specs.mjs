@@ -30,6 +30,7 @@ const STATUSES = [
 ];
 const FILE_RE = /^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const IMPLEMENTED_ALLOWED = ['done', 'superseded'];
 const REQUIRED = ['id', 'title', 'status', 'derived'];
 const KNOWN = [...REQUIRED, 'implemented', 'supersedes', 'superseded-by'];
 
@@ -128,15 +129,18 @@ for (const file of files) {
     );
   }
 
-  // `done` is the only status that asserts the work landed, so it is the only
-  // one that requires — and permits — an implementation date.
+  // `done` asserts the work landed, so it requires a date. `superseded` may
+  // also carry one: a spec can be implemented and replaced later, and dropping
+  // the date would erase the history the freeze rule exists to protect. No
+  // other status describes work that shipped.
   if (fields.status === 'done' && !fields.implemented) {
     fail(file, 'status is `done` but `implemented` is not set');
   }
-  if (fields.status !== 'done' && fields.implemented) {
+  if (fields.implemented && !IMPLEMENTED_ALLOWED.includes(fields.status)) {
     fail(
       file,
-      `\`implemented\` is set but status is \`${fields.status}\`, not \`done\``,
+      `\`implemented\` is set but status is \`${fields.status}\` — only ` +
+        `${IMPLEMENTED_ALLOWED.map((allowed) => `\`${allowed}\``).join(' and ')} describe work that shipped`,
     );
   }
   if (

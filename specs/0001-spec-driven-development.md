@@ -55,15 +55,15 @@ Specifically:
 `specs/NNNN-kebab-case-title.md`, numbered sequentially from `0001`. Each opens
 with flat `key: value` front matter:
 
-| Key             | Required          | Meaning                            |
-| --------------- | ----------------- | ---------------------------------- |
-| `id`            | yes               | Four digits, matching the filename |
-| `title`         | yes               | Short imperative title             |
-| `status`        | yes               | See the lifecycle below            |
-| `derived`       | yes               | `YYYY-MM-DD` the spec was written  |
-| `implemented`   | when `done`       | `YYYY-MM-DD` the work merged       |
-| `supersedes`    | no                | Spec ids this replaces             |
-| `superseded-by` | when `superseded` | Spec ids that replace this         |
+| Key             | Required          | Meaning                                                  |
+| --------------- | ----------------- | -------------------------------------------------------- |
+| `id`            | yes               | Four digits, matching the filename                       |
+| `title`         | yes               | Short imperative title                                   |
+| `status`        | yes               | See the lifecycle below                                  |
+| `derived`       | yes               | `YYYY-MM-DD` the spec was written                        |
+| `implemented`   | when `done`       | `YYYY-MM-DD` the work merged; kept if later `superseded` |
+| `supersedes`    | no                | Spec ids this replaces                                   |
+| `superseded-by` | when `superseded` | Spec ids that replace this                               |
 
 The body follows `specs/TEMPLATE.md`: problem, goal, non-goals, approach,
 verification, open questions.
@@ -106,8 +106,10 @@ Enforced by `scripts/check-specs.mjs`, wired into `npm run verify` as
 - missing or unknown front matter keys, or a malformed `key: value` line
 - an `id` that disagrees with the filename, or a duplicate `id`
 - a status outside the lifecycle, or a date that is not `YYYY-MM-DD`
-- `done` without `implemented`, `implemented` without `done`, or an
-  implementation date earlier than the derivation date
+- `done` without `implemented`; an `implemented` date on a status that does not
+  describe shipped work (anything but `done` or `superseded`, since a spec can
+  be implemented and replaced later); or an implementation date earlier than
+  the derivation date
 - `superseded` without `superseded-by`
 - a supersede link pointing at a spec that does not exist, or at itself
 - an empty body
