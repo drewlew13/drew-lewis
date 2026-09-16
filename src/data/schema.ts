@@ -14,10 +14,27 @@ import { z } from 'zod';
 
 const nonEmpty = z.string().trim().min(1);
 
-/** A link in the link bank. Absolute https URLs only — see the privacy rules. */
+/**
+ * A link in the link bank: an absolute https URL, or the one approved mailto.
+ *
+ * The mailto pattern rejects `%` outright, which keeps the `+` in the
+ * sub-address literal. A browser hands the href to the mail client without
+ * decoding it, so `%2B` arrives as those three characters and only a
+ * conformant client turns it back into `+`. The literal is unambiguous
+ * everywhere. See specs/0005-contact-email-link.md.
+ */
+const httpsUrl = z.string().url().startsWith('https://');
+
+const mailtoUrl = z
+  .string()
+  .regex(
+    /^mailto:[^\s@%]+@[^\s@%]+\.[^\s@%]+$/,
+    'mailto must be a single address, with no query string and no percent-encoding',
+  );
+
 export const linkSchema = z.object({
   label: nonEmpty,
-  href: z.string().url().startsWith('https://'),
+  href: z.union([httpsUrl, mailtoUrl]),
   description: nonEmpty,
 });
 

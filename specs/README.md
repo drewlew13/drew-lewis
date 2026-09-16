@@ -13,5 +13,6 @@ reality — supersede it with a new spec instead.
 | [0002](./0002-dependency-version-policy.md) | Dependency version policy for TypeScript and Node types | `done` | 2026-09-16 | 2026-09-16 |
 | [0003](./0003-resume-content-page.md) | Résumé content on the homepage, with a link bank | `done` | 2026-09-16 | 2026-09-16 |
 | [0004](./0004-section-driven-navigation.md) | Header navigation derived from the section list | `done` | 2026-09-16 | 2026-09-16 |
+| [0005](./0005-contact-email-link.md) | Contact email link with a Gmail sub-address | `done` | 2026-09-16 | 2026-09-16 |
 
 Statuses: `draft`, `accepted`, `in-progress`, `done`, `superseded`, `withdrawn`.

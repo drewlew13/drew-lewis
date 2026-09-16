@@ -33,9 +33,16 @@ export const profile = profileSchema.parse({
 
 export const links = [
   {
+    label: 'Contact Me',
+    // The `+portfolio` sub-address lets enquiries from this site be filtered in
+    // Gmail. The `+` stays literal on purpose — see specs/0005.
+    href: 'mailto:drewlew1313+portfolio@gmail.com',
+    description: 'Opens your mail app to drewlew1313+portfolio@gmail.com',
+  },
+  {
     label: 'LinkedIn',
     href: 'https://www.linkedin.com/in/drew-lewis-94137618b',
-    description: 'Professional profile and the best way to get in touch',
+    description: 'Professional profile and work history',
   },
   {
     label: 'GitHub',
