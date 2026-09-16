@@ -1,8 +1,9 @@
 ---
 id: 0003
 title: Résumé content on the homepage, with a link bank
-status: draft
+status: done
 derived: 2026-09-16
+implemented: 2026-09-16
 ---
 
 ## Problem
@@ -102,7 +103,7 @@ rewrite, and it is the only piece of forward-looking design in this spec.
 A row of buttons in the identity section, each a plain anchor:
 
 - **LinkedIn** — the profile on the résumé
-- **GitHub** — URL required from Drew; see Open questions
+- **GitHub** — `https://github.com/drewlew13`
 
 Requirements:
 
@@ -180,19 +181,30 @@ Screenshots at 375px and desktop width, in both colour schemes, reviewed before
 the pull request is opened — the four boxes in the PR template, done rather than
 asserted.
 
-## Open questions
+## Resolved questions
 
-1. **GitHub URL.** Required for the link bank. Blocking for that button only;
-   the rest of the page does not depend on it.
-2. **"Self-driving full-stack software engineer"** opens the résumé summary.
-   This reads as a typo for "self-driven". Article 5 permits editing for
-   clarity, but this is Drew's self-description, so it is his call: correct it,
-   keep it, or replace the descriptor.
-3. **"4 years experience"** goes stale. It can be derived from the July 2022
-   start date so it stays true, or rewritten as "since 2022". A hard-coded
-   number is wrong within a year, and Article 5 makes accuracy non-negotiable.
-4. **Education dates.** The résumé gives no graduation year. Include one, or
-   leave education undated as it is now?
+All four were answered before implementation began.
 
-A spec cannot reach `done` with open questions. These resolve before
-implementation starts.
+1. **GitHub URL** — `https://github.com/drewlew13`, in the link bank.
+2. **"Self-driving"** — corrected to "self-driven".
+3. **Years of experience** — derived from a `careerStart` of 2022-07-01 and
+   substituted into the summary at render time, so the figure cannot go stale.
+   A test asserts the page carries the computed value and that the placeholder
+   is gone.
+4. **Education dates** — 2018 – 2022.
+
+### One further edit, for the record
+
+The résumé summary ends "maintaining it through its whole lifecycle", where
+"it" refers back to the plural "software solutions". The page reads "maintaining
+them through the whole lifecycle". Article 5 permits editing for clarity, and
+this is a grammatical correction rather than a change of meaning — but it is
+Drew's own wording, so it is noted here rather than made silently.
+
+### A note on the spec itself
+
+Two drafts of this spec leaked what it exists to withhold: an earlier version
+quoted the unsoftened figures in a comparison table, and named the real city
+while describing the rule that replaces it. This repository is public, so
+`specs/` is as published as `src/`. Documenting a redaction can reproduce the
+redacted thing — worth remembering when the next spec covers private material.
