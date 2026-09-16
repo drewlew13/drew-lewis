@@ -1,16 +1,96 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Entry from '../components/Entry.astro';
+import LinkBank from '../components/LinkBank.astro';
+import Section from '../components/Section.astro';
+import {
+  education,
+  experience,
+  links,
+  profile,
+  projects,
+  renderSummary,
+  skills,
+} from '../data/resume';
+
+const summary = renderSummary();
 ---
 
 <BaseLayout
   title="Drew Lewis"
-  description="Portfolio and professional experience of Drew Lewis."
+  description={`Portfolio and professional experience of Drew Lewis, a full stack engineer based in ${profile.location}.`}
 >
-  <h1 class="text-4xl font-semibold tracking-tight text-balance text-ink">
-    Drew Lewis
-  </h1>
-  <p class="mt-4 max-w-prose text-lg text-pretty text-ink-muted">
-    This is the baseline scaffold. Content lands here once the constitution is
-    agreed and the first content branch is opened.
-  </p>
+  <div class="space-y-14">
+    <header>
+      <h1 class="text-4xl font-semibold tracking-tight text-balance text-ink sm:text-5xl">
+        {profile.name}
+      </h1>
+      <p class="mt-3 text-lg text-pretty text-ink-muted">
+        {profile.descriptor}
+      </p>
+      <p class="mt-1 text-sm text-ink-muted">{profile.location}</p>
+      <div class="mt-6">
+        <LinkBank links={links} />
+      </div>
+    </header>
+
+    <Section id="summary" title="Summary">
+      <p class="max-w-prose text-pretty text-ink-muted">{summary}</p>
+    </Section>
+
+    <Section id="experience" title="Work Experience">
+      <div class="space-y-10">
+        {experience.map((entry) => (
+          <Entry entry={entry} />
+        ))}
+      </div>
+    </Section>
+
+    <Section id="projects" title="Projects & Other Experience">
+      <div class="space-y-10">
+        {projects.map((entry) => (
+          <Entry entry={entry} />
+        ))}
+      </div>
+    </Section>
+
+    <Section id="education" title="Education">
+      <div class="space-y-8">
+        {education.map((entry) => (
+          <article id={entry.slug} class="scroll-mt-8">
+            <div class="flex flex-col gap-x-6 gap-y-1 sm:flex-row sm:items-baseline sm:justify-between">
+              <h3 class="text-base font-semibold text-ink">
+                {entry.institution}
+              </h3>
+              <p class="shrink-0 text-sm text-ink-muted tabular-nums">
+                {entry.start} – {entry.end}
+              </p>
+            </div>
+            <p class="mt-1 text-sm text-ink-muted">
+              {[entry.qualification, entry.focus, entry.location]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+          </article>
+        ))}
+      </div>
+    </Section>
+
+    <Section id="skills" title="Technical Skills">
+      <div class="space-y-6">
+        {skills.map((group) => (
+          <div>
+            <h3 class="text-sm font-semibold text-ink">{group.name}</h3>
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {group.items.map((item) => (
+                <li class="rounded-md border border-border bg-surface-raised px-2.5 py-1 text-xs text-ink-muted">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Section>
+  </div>
 </BaseLayout>
