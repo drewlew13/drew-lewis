@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import headshotImage from '../assets/headshot-placeholder.png';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Entry from '../components/Entry.astro';
 import LinkBank from '../components/LinkBank.astro';
@@ -7,6 +9,7 @@ import { section } from '../data/sections';
 import {
   education,
   experience,
+  headshot,
   links,
   profile,
   projects,
@@ -30,13 +33,30 @@ const summary = renderSummary();
         {profile.descriptor}
       </p>
       <p class="mt-1 text-sm text-ink-muted">{profile.location}</p>
-      <div class="mt-6">
-        <LinkBank links={links} />
-      </div>
     </header>
 
-    <Section {...section('summary')}>
-      <p class="max-w-prose text-pretty text-ink-muted">{summary}</p>
+    <Section {...section('about')}>
+      {/* Blurb left, headshot right from `sm` up; stacked in the same document
+          order below it. Visual order matches document order at every width, so
+          a screen reader announces what a sighted reader sees. Rendered at 2×
+          the displayed size and masked to a circle — the source is square, so
+          the mask never crops a face off-centre. */}
+      <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
+        <p class="max-w-prose text-pretty text-ink-muted">{summary}</p>
+        <Image
+          src={headshotImage}
+          alt={headshot.alt}
+          width={288}
+          height={288}
+          loading="eager"
+          decoding="async"
+          class="size-32 shrink-0 rounded-full border border-border object-cover sm:size-36"
+        />
+      </div>
+
+      <div class="mt-8">
+        <LinkBank links={links} />
+      </div>
     </Section>
 
     <Section {...section('experience')}>

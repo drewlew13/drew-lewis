@@ -3,6 +3,7 @@ import { sections } from '../src/data/sections';
 import {
   education,
   experience,
+  headshot,
   links,
   profile,
   projects,
@@ -77,18 +78,18 @@ test.describe('homepage content', () => {
 
     // The rendered summary must carry the computed figure, not a stale literal.
     expect(renderSummary()).toContain(`${years} years`);
-    await expect(page.locator('#summary')).toContainText(`${years} years`);
-    await expect(page.locator('#summary')).not.toContainText('{years}');
+    await expect(page.locator('#about')).toContainText(`${years} years`);
+    await expect(page.locator('#about')).not.toContainText('{years}');
   });
 
   test('link bank exposes every link with a usable accessible name', async ({
     page,
   }) => {
-    const bank = page.locator('main header ul a');
+    const bank = page.locator('#about ul a');
     await expect(bank).toHaveCount(links.length);
 
     for (const link of links) {
-      const anchor = page.locator(`main header a[href="${link.href}"]`);
+      const anchor = page.locator(`#about a[href="${link.href}"]`);
       await expect(anchor, `link ${link.label} is missing`).toHaveCount(1);
 
       const name = (await anchor.textContent())?.trim() ?? '';
@@ -127,10 +128,60 @@ test.describe('homepage content', () => {
     expect(address).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 
     // And the anchor on the page carries it unchanged.
-    const anchor = page.locator(`main header a[href="${href}"]`);
+    const anchor = page.locator(`#about a[href="${href}"]`);
     await page.goto('');
     await expect(anchor).toHaveCount(1);
     await expect(anchor).toHaveAttribute('href', href);
+  });
+
+  test('the link bank moved out of the hero and left nothing behind', async ({
+    page,
+  }) => {
+    await page.goto('');
+
+    // The hero is now name, descriptor and location only.
+    await expect(page.locator('main > div > header a')).toHaveCount(0);
+
+    // And every link is present in the About section instead.
+    await expect(page.locator('#about ul a')).toHaveCount(links.length);
+  });
+
+  test('the About section shows a headshot that will not shift the layout', async ({
+    page,
+  }) => {
+    await page.goto('');
+
+    const image = page.locator('#about img');
+    await expect(image).toHaveCount(1);
+
+    const alt = await image.getAttribute('alt');
+    expect(alt?.trim().length, 'headshot has no alt text').toBeGreaterThan(0);
+    expect(alt).toBe(headshot.alt);
+
+    // Explicit intrinsic dimensions, so nothing jumps as the image loads.
+    const width = Number(await image.getAttribute('width'));
+    const height = Number(await image.getAttribute('height'));
+    expect(width).toBeGreaterThan(0);
+    expect(height).toBeGreaterThan(0);
+    expect(width, 'the headshot source should be square').toBe(height);
+
+    // Eager, because this sits at the top of the page; lazy would delay the
+    // largest paint rather than help it.
+    await expect(image).toHaveAttribute('loading', 'eager');
+  });
+
+  test('the headshot alt text and placeholder flag agree', async () => {
+    const saysPlaceholder = /placeholder/i.test(headshot.alt);
+
+    // The schema enforces this at build time; asserting it here means a change
+    // to either side fails loudly rather than shipping a placeholder described
+    // as a photograph of Drew, or the reverse.
+    expect(
+      saysPlaceholder,
+      headshot.isPlaceholder
+        ? 'this is a placeholder, so the alt text must say so'
+        : 'this is a real photograph, so the alt text must not say placeholder',
+    ).toBe(headshot.isPlaceholder);
   });
 
   test('heading levels descend without skipping', async ({ page }) => {

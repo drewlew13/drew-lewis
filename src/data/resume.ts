@@ -1,5 +1,6 @@
 import {
   educationSchema,
+  headshotSchema,
   entrySchema,
   linkSchema,
   profileSchema,
@@ -29,6 +30,12 @@ export const profile = profileSchema.parse({
     'building and maintaining microservices, observability pipelines, and ' +
     'developer tools. Skilled at shipping software solutions and maintaining ' +
     'them through the whole lifecycle.',
+});
+
+export const headshot = headshotSchema.parse({
+  file: 'headshot-placeholder.png',
+  alt: 'Placeholder for a headshot of Drew Lewis',
+  isPlaceholder: true,
 });
 
 export const links = [

@@ -24,7 +24,7 @@ const sectionSchema = z.object({
 });
 
 export const sections = [
-  { id: 'summary', title: 'Summary', navLabel: 'Summary' },
+  { id: 'about', title: 'About', navLabel: 'About' },
   { id: 'experience', title: 'Work Experience', navLabel: 'Experience' },
   {
     id: 'projects',
