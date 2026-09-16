@@ -8,6 +8,34 @@ it, not rewriting it. See CONSTITUTION.md, Article 9.
 
 ---
 
+## 2026-09-16 — Document the branch ruleset as configured
+
+**Who:** Drew Lewis
+**Spec:** None — this records settings already decided, not a new decision.
+
+**What changed:** Appendix A item 2 now describes the `main` ruleset as it is
+actually configured. It adds the three rules that were live but undocumented —
+squash as the only allowed merge method, require branches to be up to date
+before merging, and require conversation resolution — states that the ruleset
+must have no bypass actors, and explains why required approvals sits at 0.
+
+**Why:** The ruleset was stricter than the document described. Appendix A is the
+reproduction recipe: anyone rebuilding this repository, or setting up another
+from it, would have recreated a weaker ruleset without noticing. Undocumented
+enforcement is the same class of problem as unenforced documentation, just
+harder to see.
+
+The approvals note exists because the reasoning is not obvious from the setting.
+GitHub does not let you approve your own pull request, so raising it above 0 on
+a single-maintainer repository locks `main` unless you add a bypass actor — a
+future reader could easily "fix" the 0 and lock themselves out.
+
+The gap surfaced when PR #1 merged as a merge commit despite Article 2 calling
+for a squash. The ruleset has since been corrected; this brings the document in
+line with it.
+
+---
+
 ## 2026-09-16 — Specs and this change log
 
 **Who:** Drew Lewis
