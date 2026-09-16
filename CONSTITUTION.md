@@ -131,20 +131,37 @@ has load-bearing consequences elsewhere.
 - **TypeScript** in strict mode for anything that is not markup.
 - **Node 24** (`.nvmrc`), matched by CI.
 
-### Base path
+### Hosting and base path
 
 The site is a GitHub Pages _project_ page at
-`https://drewlew13.github.io/drew-lewis/`. It is served from a subpath, not the
+`https://drewlew13.github.io/drew-lewis/`, served from a subpath rather than a
 domain root.
 
-**Every internal link and asset reference must go through `withBase()`**
-(`src/lib/url.ts`). A hard-coded `href="/about"` works in development and 404s
-in production — the single most likely way to ship a broken site here. The link
-crawl in the test suite runs against the real base path specifically to catch
-this.
+**This is a decision, not a default.** A custom domain was considered and
+declined for now: nothing about the site needs one yet, and it adds a
+registration to renew and DNS records to maintain. Revisit it when the URL
+starts going on applications or a CV — a custom domain is a small but real
+professional signal, and Article 1 is about how the site reads to someone who
+has never met Drew.
 
-If the site ever moves to a custom domain or a user page, `site` and `base` in
-`astro.config.mjs` change together, and the test suite's base URL with them.
+The option stays cheap, and deliberately so. Migrating means changing `site`
+and `base` in `astro.config.mjs` and nothing else in the codebase: the preview
+server and the Playwright base URL both derive from that file, and `withBase()`
+returns root-relative paths when there is no base. That was verified by dry run
+rather than assumed. The remaining work is external — DNS (A records for an
+apex domain, a CNAME for `www`), the custom domain field under Settings →
+Pages, enforcing HTTPS once the certificate provisions, and verifying the
+domain so it cannot be claimed by someone else later. No `CNAME` file is
+involved, because deployment publishes an artifact through
+`actions/deploy-pages` rather than pushing to a branch.
+
+**While the site is on a subpath, every internal link and asset reference must
+go through `withBase()`** (`src/lib/url.ts`). A hard-coded `href="/about"`
+works in development and 404s in production — the single most likely way to
+ship a broken site here. Keep using it after any future move: it costs nothing
+at a domain root and is what keeps this decision reversible. The link crawl and
+the base-path guard in the test suite both run against the real base path
+specifically to catch violations.
 
 ### Styling
 
