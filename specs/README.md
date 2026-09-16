@@ -10,5 +10,6 @@ reality — supersede it with a new spec instead.
 | ID | Title | Status | Derived | Implemented |
 | --- | --- | --- | --- | --- |
 | [0001](./0001-spec-driven-development.md) | Spec-driven development and constitution change log | `done` | 2026-09-16 | 2026-09-16 |
+| [0002](./0002-dependency-version-policy.md) | Dependency version policy for TypeScript and Node types | `done` | 2026-09-16 | 2026-09-16 |
 
 Statuses: `draft`, `accepted`, `in-progress`, `done`, `superseded`, `withdrawn`.

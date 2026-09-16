@@ -11,6 +11,19 @@ updates:
         dependency-type: development
       production-dependencies:
         dependency-type: production
+    ignore:
+      # TypeScript 7 (the native rewrite) is not yet supported by our
+      # toolchain: @astrojs/check caps at ^6 and typescript-eslint at <6.1.0,
+      # both at their latest versions. An install with TypeScript 7 fails
+      # outright. Drop this entry once both declare support — see
+      # specs/0002-dependency-version-policy.md.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # @types/node tracks the Node major in .nvmrc, not the newest release.
+      # Types ahead of the runtime let TypeScript accept APIs that do not
+      # exist when the code runs. Bump this by hand when .nvmrc moves.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
