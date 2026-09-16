@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { sections } from '../src/data/sections';
 import {
   education,
   experience,
@@ -16,14 +17,6 @@ import {
  * dropped by a markup change. See specs/0003-resume-content-page.md.
  */
 
-const SECTIONS = [
-  { id: 'summary', title: 'Summary' },
-  { id: 'experience', title: 'Work Experience' },
-  { id: 'projects', title: 'Projects & Other Experience' },
-  { id: 'education', title: 'Education' },
-  { id: 'skills', title: 'Technical Skills' },
-];
-
 test.describe('homepage content', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('');
@@ -32,14 +25,14 @@ test.describe('homepage content', () => {
   test('renders every résumé section, each linkable by id', async ({
     page,
   }) => {
-    for (const section of SECTIONS) {
+    for (const section of sections) {
       const element = page.locator(`section#${section.id}`);
       await expect(element, `section #${section.id} is missing`).toHaveCount(1);
       await expect(element.locator('h2')).toHaveText(section.title);
     }
 
     // No extra sections beyond the ones the spec defines.
-    await expect(page.locator('main section')).toHaveCount(SECTIONS.length);
+    await expect(page.locator('main section')).toHaveCount(sections.length);
   });
 
   test('renders one entry per record, with no entry dropped', async ({
