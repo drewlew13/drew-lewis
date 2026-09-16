@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { sections } from '../src/data/sections';
 import {
   education,
   experience,
@@ -16,14 +17,6 @@ import {
  * dropped by a markup change. See specs/0003-resume-content-page.md.
  */
 
-const SECTIONS = [
-  { id: 'summary', title: 'Summary' },
-  { id: 'experience', title: 'Work Experience' },
-  { id: 'projects', title: 'Projects & Other Experience' },
-  { id: 'education', title: 'Education' },
-  { id: 'skills', title: 'Technical Skills' },
-];
-
 test.describe('homepage content', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('');
@@ -32,14 +25,14 @@ test.describe('homepage content', () => {
   test('renders every résumé section, each linkable by id', async ({
     page,
   }) => {
-    for (const section of SECTIONS) {
+    for (const section of sections) {
       const element = page.locator(`section#${section.id}`);
       await expect(element, `section #${section.id} is missing`).toHaveCount(1);
       await expect(element.locator('h2')).toHaveText(section.title);
     }
 
     // No extra sections beyond the ones the spec defines.
-    await expect(page.locator('main section')).toHaveCount(SECTIONS.length);
+    await expect(page.locator('main section')).toHaveCount(sections.length);
   });
 
   test('renders one entry per record, with no entry dropped', async ({
@@ -102,9 +95,42 @@ test.describe('homepage content', () => {
       expect(name.length, `link ${link.label} has no text`).toBeGreaterThan(0);
       expect(name).toContain(link.label);
 
-      await expect(anchor).toHaveAttribute('rel', /noopener/);
-      expect(link.href.startsWith('https://')).toBe(true);
+      if (link.href.startsWith('mailto:')) {
+        // rel is meaningless on a mailto — there is no document to open.
+        await expect(anchor).not.toHaveAttribute('rel', /.*/);
+      } else {
+        await expect(anchor).toHaveAttribute('rel', /noopener/);
+        expect(link.href.startsWith('https://')).toBe(true);
+      }
     }
+  });
+
+  test('the contact link is a working mailto with a literal sub-address', async ({
+    page,
+  }) => {
+    const contact = links.filter((link) => link.href.startsWith('mailto:'));
+    expect(contact, 'exactly one contact link is expected').toHaveLength(1);
+
+    const [{ href }] = contact;
+    const address = href.slice('mailto:'.length);
+
+    // No query string: the address is the whole path, so nothing can be
+    // mistaken for form encoding.
+    expect(href).not.toContain('?');
+
+    // The `+` stays literal. A browser hands the href to the mail client
+    // without decoding it, so `%2B` would arrive as three characters and only a
+    // conformant client would turn it back into `+`.
+    expect(address).toContain('+');
+    expect(href).not.toContain('%');
+
+    expect(address).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+
+    // And the anchor on the page carries it unchanged.
+    const anchor = page.locator(`main header a[href="${href}"]`);
+    await page.goto('');
+    await expect(anchor).toHaveCount(1);
+    await expect(anchor).toHaveAttribute('href', href);
   });
 
   test('heading levels descend without skipping', async ({ page }) => {

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { sections } from '../data/sections';
 import { withBase } from '../lib/url';
 
 interface Props {
@@ -34,20 +35,30 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     </a>
 
     <div class="mx-auto flex min-h-dvh max-w-3xl flex-col px-6">
-      <header class="flex items-center justify-between py-8">
+      <header class="flex flex-col gap-3 py-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <a
           href={withBase('/')}
-          class="text-lg font-semibold tracking-tight text-ink hover:text-accent"
+          class="text-lg font-bold tracking-tight text-ink hover:text-accent"
         >
           Drew Lewis
         </a>
+
+        {/* Built from src/data/sections.ts, so adding or renaming a section
+            updates this navigation with it. Each link carries the full path
+            rather than a bare fragment, so it also works from the 404 page,
+            where it navigates home and then scrolls. */}
         <nav aria-label="Primary">
-          <ul class="flex gap-6 text-sm text-ink-muted">
-            <li>
-              <a class="hover:text-accent" href={withBase('/')}>
-                Home
-              </a>
-            </li>
+          <ul class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-muted">
+            {sections.map((entry) => (
+              <li>
+                <a
+                  class="rounded-sm hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                  href={`${withBase('/')}#${entry.id}`}
+                >
+                  {entry.navLabel}
+                </a>
+              </li>
+            ))}
           </ul>
         </nav>
       </header>
