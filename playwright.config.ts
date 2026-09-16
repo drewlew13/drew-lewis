@@ -1,13 +1,25 @@
 import { defineConfig, devices } from '@playwright/test';
+import astroConfig from './astro.config.mjs';
 
 /**
- * Tests run against `astro preview`, not the dev server, because preview serves
- * the real production build under the real `base` path (`/drew-lewis/`). The dev
- * server is more forgiving, which is exactly why it is the wrong thing to
- * validate against.
+ * Tests run against the production build served by `scripts/preview.mjs` under
+ * the real base path, not against the dev server. The dev server is more
+ * forgiving about exactly the things that break on GitHub Pages.
+ *
+ * `baseURL` must keep its trailing slash: Playwright resolves `page.goto()`
+ * with the URL() constructor, which drops the last path segment when there is
+ * no trailing slash. Routes are base-relative for the same reason.
  */
 const PORT = 4321;
-const BASE_URL = `http://localhost:${PORT}/drew-lewis`;
+
+// Derived from astro.config.mjs rather than repeated here, so changing the
+// deployment URL stays a one-file change. The preview server derives it the
+// same way.
+const BASE = `/${(astroConfig.base ?? '').replace(/^\/|\/$/g, '')}`.replace(
+  /^\/$/,
+  '',
+);
+const BASE_URL = `http://localhost:${PORT}${BASE}/`;
 
 export default defineConfig({
   testDir: './tests',

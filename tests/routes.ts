@@ -17,17 +17,19 @@ function walk(dir: string): string[] {
  * hand-listed. Adding a page automatically puts it under the accessibility
  * suite; there is no list to forget to update.
  *
- * Paths are relative to the configured base, so they compose with Playwright's
- * `baseURL` (which already includes `/drew-lewis`).
+ * Routes are returned WITHOUT a leading slash, and this matters: Playwright
+ * resolves `page.goto()` against `baseURL` with the URL() constructor, and a
+ * leading slash makes URL() discard baseURL's path entirely. `goto('/404')`
+ * against a baseURL of `.../drew-lewis/` requests `/404`, silently testing the
+ * wrong page. The homepage is the empty string.
  */
 export function builtRoutes(): string[] {
   const routes = walk(DIST)
     .map((file) => relative(DIST, file).split(sep).join('/'))
-    .map(
-      (rel) =>
-        '/' + rel.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, ''),
+    .map((rel) =>
+      rel.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, ''),
     )
-    .map((route) => (route.length > 1 ? route.replace(/\/$/, '') : route));
+    .map((route) => route.replace(/\/$/, ''));
 
   return [...new Set(routes)].sort();
 }

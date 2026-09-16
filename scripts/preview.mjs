@@ -82,7 +82,16 @@ function send(res, status, file) {
 }
 
 const server = createServer((req, res) => {
-  const { pathname } = new URL(req.url, `http://localhost:${PORT}`);
+  // A request line like `//` parses as protocol-relative rather than as a
+  // path. Reject it instead of letting it throw and take the server down.
+  let pathname;
+  try {
+    ({ pathname } = new URL(req.url, `http://localhost:${PORT}`));
+  } catch {
+    res.writeHead(400, { 'content-type': 'text/plain; charset=utf-8' });
+    res.end('400 Bad Request\n');
+    return;
+  }
 
   // Requests to the origin root are not something Pages serves for a project
   // page; send them to the base so a bare localhost visit still works.

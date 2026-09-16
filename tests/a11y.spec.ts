@@ -9,7 +9,18 @@ test('the build produced at least one page', () => {
 });
 
 for (const route of routes) {
-  test.describe(`page ${route}`, () => {
+  test.describe(`page /${route}`, () => {
+    test('is served under the configured base path', async ({
+      page,
+      baseURL,
+    }) => {
+      // Guards against a route or baseURL change that quietly drops the base
+      // prefix and tests the wrong URL. See tests/routes.ts.
+      const response = await page.goto(route);
+      expect(response?.status()).toBe(200);
+      expect(page.url()).toContain(new URL(baseURL!).pathname);
+    });
+
     test('has no detectable accessibility violations', async ({ page }) => {
       await page.goto(route);
 
