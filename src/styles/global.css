@@ -1,0 +1,64 @@
+@import 'tailwindcss';
+
+/* Design tokens live here and nowhere else. Components reference them through
+   Tailwind utilities (`bg-surface`, `text-ink`, ...) rather than hard-coded hex
+   values, so a palette change stays a one-file change.
+   `@theme inline` maps each utility to a CSS variable instead of baking in a
+   literal, which is what lets the dark-mode block below re-point them. */
+:root {
+  --ink: oklch(0.22 0.02 260);
+  --ink-muted: oklch(0.52 0.02 260);
+  --surface: oklch(0.99 0.004 260);
+  --surface-raised: oklch(0.96 0.006 260);
+  --accent: oklch(0.5 0.16 255);
+  --border: oklch(0.88 0.008 260);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ink: oklch(0.95 0.01 260);
+    --ink-muted: oklch(0.74 0.02 260);
+    --surface: oklch(0.18 0.02 260);
+    --surface-raised: oklch(0.23 0.02 260);
+    --accent: oklch(0.78 0.13 255);
+    --border: oklch(0.32 0.015 260);
+  }
+}
+
+:root[data-theme='dark'] {
+  --ink: oklch(0.95 0.01 260);
+  --ink-muted: oklch(0.74 0.02 260);
+  --surface: oklch(0.18 0.02 260);
+  --surface-raised: oklch(0.23 0.02 260);
+  --accent: oklch(0.78 0.13 255);
+  --border: oklch(0.32 0.015 260);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+/* Respect users who ask the OS to reduce motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
