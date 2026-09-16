@@ -13,8 +13,10 @@
     "lint:fix": "eslint . --fix",
     "test:a11y": "playwright test tests/a11y.spec.ts",
     "test:links": "playwright test tests/links.spec.ts",
-    "verify": "npm run check:format && npm run lint && npm run check:astro && npm run build && npm run test",
-    "test": "playwright test"
+    "verify": "npm run check:format && npm run lint && npm run check:specs && npm run check:astro && npm run build && npm run test",
+    "test": "playwright test",
+    "check:specs": "node scripts/check-specs.mjs",
+    "specs:index": "node scripts/check-specs.mjs --write"
   },
   "repository": {
     "type": "git",

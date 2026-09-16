@@ -24,6 +24,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The spec and change log guards below diff against the base branch.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -39,8 +42,32 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Check specs
+        run: npm run check:specs
+
       - name: Typecheck
         run: npm run check:astro
+
+      # These two need a base branch to compare against, so they cannot run as
+      # part of `npm run verify` on a developer's machine.
+      - name: Check frozen specs
+        if: github.event_name == 'pull_request'
+        run: |
+          node scripts/check-specs.mjs --frozen "origin/$BASE"
+        env:
+          BASE: ${{ github.base_ref }}
+
+      - name: Require a change log entry for constitution changes
+        if: github.event_name == 'pull_request'
+        run: |
+          changed=$(git diff --name-only "origin/$BASE"...HEAD)
+          if grep -qxF 'CONSTITUTION.md' <<<"$changed" \
+            && ! grep -qxF 'CONSTITUTION-CHANGELOG.md' <<<"$changed"; then
+            echo "::error::CONSTITUTION.md changed without a CONSTITUTION-CHANGELOG.md entry. See Article 9."
+            exit 1
+          fi
+        env:
+          BASE: ${{ github.base_ref }}
 
       - name: Build
         run: npm run build

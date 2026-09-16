@@ -46,6 +46,9 @@ interesting it may be to build.
 
 ### All work happens on feature branches
 
+Non-trivial work starts from a spec, not from a branch — see
+[Article 9](#article-9--how-change-happens).
+
 Branch from the current `main`, one branch per coherent change:
 
 ```
@@ -90,9 +93,11 @@ That command is the gate. It runs, in order:
 
 1. `check:format` — Prettier, so diffs show intent rather than whitespace
 2. `lint` — ESLint, including static accessibility rules on `.astro` templates
-3. `check:astro` — TypeScript and Astro diagnostics
-4. `build` — the production build actually completes
-5. `test` — Playwright: axe accessibility audit on every built page, plus an
+3. `check:specs` — spec front matter, lifecycle, and index are valid
+   ([Article 9](#article-9--how-change-happens))
+4. `check:astro` — TypeScript and Astro diagnostics
+5. `build` — the production build actually completes
+6. `test` — Playwright: axe accessibility audit on every built page, plus an
    internal broken-link crawl
 
 A commit is permitted only when `npm run verify` exits zero on the working tree
@@ -115,6 +120,11 @@ being committed. Not "it passed earlier". Not "only the CSS changed".
 required to pass before merge. It exists to catch what a local machine hides
 (a missing dependency, an uncommitted file, a platform difference), not to do
 the verifying for you.
+
+Two checks run only there, because they compare against the base branch and so
+have nothing to compare against locally: that a `done` spec's body has not been
+edited, and that a change to `CONSTITUTION.md` comes with a change log entry.
+Both are described in [Article 9](#article-9--how-change-happens).
 
 ---
 
@@ -255,18 +265,90 @@ why. It does not silently relax a rule to complete a task.
 
 ---
 
-## Article 9 — Amendment
+## Article 9 — How change happens
+
+Work here is spec-driven. A decision that lives only in a conversation is a
+decision nobody can find later — and agent sessions do not carry transcripts
+between them at all. Specs are how reasoning outlives the conversation that
+produced it.
+
+### Specs
+
+Non-trivial changes start with a spec in `specs/`, named
+`NNNN-kebab-case-title.md` and numbered sequentially. Each one opens with front
+matter recording its `id`, `title`, `status`, the date it was `derived`, and,
+once the work lands, the date it was `implemented`.
+
+The body follows `specs/TEMPLATE.md`: problem, goal, non-goals, approach,
+verification, open questions. The non-goals section is the one that keeps a
+spec from quietly growing; the verification section ties it to Article 3.
+
+**"Non-trivial" means someone would reasonably ask "why was this done this
+way?" six months from now.** A typo fix, a dependency bump, or a copy tweak
+does not need a spec. A new page, a change to the build, a shift in how the
+site is structured or hosted does.
+
+`specs/README.md` indexes every spec and its status. It is generated —
+`npm run specs:index` — and `npm run verify` fails if it has drifted from the
+files it describes.
+
+### The spec lifecycle
+
+```
+draft → accepted → in-progress → done
+                              ↘ withdrawn
+done → superseded
+```
+
+| Status        | Meaning                                            |
+| ------------- | -------------------------------------------------- |
+| `draft`       | Being written; not agreed                          |
+| `accepted`    | Agreed, not started                                |
+| `in-progress` | Being implemented on a branch                      |
+| `done`        | Merged, and frozen from that point                 |
+| `superseded`  | Replaced by a later spec, named in `superseded-by` |
+| `withdrawn`   | Abandoned before implementation                    |
+
+A spec cannot reach `done` with open questions still in it.
+
+### A spec in `done` is frozen
+
+**Once a spec is `done`, it is not retroactively updated.** It records what was
+decided, and why, at the time it was decided. That is its entire value; a spec
+edited to match what the code happens to do today is just out-of-date
+documentation with a date on it.
+
+Only two things may change on a `done` spec: its `status`, and its
+`superseded-by` link. The body is immutable, and CI enforces that against the
+base branch.
+
+If a decision it records should change, write a new spec that supersedes it.
+That leaves both the original reasoning and the reason it changed on the
+record, which is the point.
+
+### Amending this constitution
 
 This document is expected to change as the site matures. It should be amended
 deliberately, not eroded quietly.
 
 1. Open a `docs/` branch changing `CONSTITUTION.md` alone.
-2. State in the PR description what rule changes, and what problem changing it
-   solves.
-3. Merge it before opening work that depends on the new rule.
+2. Add an entry to `CONSTITUTION-CHANGELOG.md` naming who decided it, the
+   driving spec, what changed, and why. A pull request that changes the
+   constitution without one fails CI.
+3. State the same reasoning in the PR description.
+4. Merge it before opening work that depends on the new rule.
 
 A rule that is routinely worked around is a bug in this document. Fix it here
 rather than tolerating the drift.
+
+### The change log
+
+`CONSTITUTION-CHANGELOG.md` is the history of this document in plain language,
+newest first. It is append-only: correcting the record means adding to it, not
+rewriting it, for the same reason `done` specs are frozen.
+
+Git already knows what changed. The change log exists to record **who decided
+it and why**, which a diff cannot tell you.
 
 ---
 
@@ -297,4 +379,6 @@ they are done, the rules above are conventions rather than constraints.
 | `npm run format`       | Prettier write                                          |
 | `npm run lint`         | ESLint, including template accessibility rules          |
 | `npm run check:astro`  | TypeScript and Astro diagnostics                        |
+| `npm run check:specs`  | Spec front matter, lifecycle, and index are valid       |
+| `npm run specs:index`  | Regenerate `specs/README.md`                            |
 | `npm test`             | Playwright: axe audit and internal link crawl           |
